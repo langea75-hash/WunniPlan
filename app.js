@@ -227,20 +227,10 @@ function renderJourney(journey) {
 
 function officialDbUrl() {
   const route = currentRoute();
-  const date = $('dateInput').value;
-  const time = $('timeInput').value;
-  const dt = new Date(`${date}T${time}:00`);
-  const pad = (n) => String(n).padStart(2, '0');
-  const dbDate = `${pad(dt.getDate())}.${pad(dt.getMonth() + 1)}.${dt.getFullYear()}`;
-  const dbTime = `${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
-  const url = new URL('https://www.bahn.de/buchung/fahrplan/suche');
-  url.searchParams.set('so', route.from.display);
-  url.searchParams.set('zo', route.to.display);
-  url.searchParams.set('hd', `${dbDate}T${dbTime}:00`);
-  url.searchParams.set('hza', 'D');
-  url.searchParams.set('ar', 'false');
-  url.searchParams.set('s', 'true');
-  url.searchParams.set('d', 'true');
+  // Die DB-Webseite ändert ihre internen Suchparameter regelmäßig.
+  // Diese einfache Startseite füllt Start und Ziel zuverlässig vor.
+  const url = new URL('https://www.bahn.de/buchung/start');
+  url.hash = `?SO=${encodeURIComponent(route.from.display)}&ZO=${encodeURIComponent(route.to.display)}`;
   return url.toString();
 }
 
@@ -251,13 +241,13 @@ function showApiError(error) {
   const strong = document.createElement('strong');
   strong.textContent = 'Live-Datenquelle antwortet gerade nicht.';
   const text = document.createElement('p');
-  text.textContent = 'Du kannst die Verbindung trotzdem direkt bei der Deutschen Bahn öffnen.';
+  text.textContent = 'Die kostenlose Live-Schnittstelle ist gerade nicht erreichbar. Start und Ziel kannst du direkt bei der Deutschen Bahn öffnen.';
   const link = document.createElement('a');
   link.className = 'db-fallback';
   link.href = officialDbUrl();
   link.target = '_blank';
   link.rel = 'noopener';
-  link.textContent = 'Verbindung bei DB öffnen';
+  link.textContent = 'Wunstorf ↔ Hannover bei DB öffnen';
   box.append(strong, text, link);
   if (error?.message) {
     const detail = document.createElement('small');
@@ -310,6 +300,38 @@ function departureToJourney(dep, targetId) {
   };
 }
 
+async function requestJourneys(route) {
+  const url = new URL(`${API}/journeys`);
+  url.searchParams.set('from', route.from.id);
+  url.searchParams.set('to', route.to.id);
+  url.searchParams.set('departure', selectedDepartureIso());
+  url.searchParams.set('results', '8');
+  url.searchParams.set('stopovers', 'true');
+  url.searchParams.set('remarks', 'true');
+  url.searchParams.set('language', 'de');
+  url.searchParams.set('nationalExpress', 'true');
+  url.searchParams.set('national', 'true');
+  url.searchParams.set('regionalExpress', 'true');
+  url.searchParams.set('regional', 'true');
+  url.searchParams.set('suburban', 'true');
+  url.searchParams.set('bus', 'false');
+  url.searchParams.set('tram', 'false');
+  url.searchParams.set('subway', 'false');
+  url.searchParams.set('ferry', 'false');
+  url.searchParams.set('taxi', 'false');
+
+  let lastError;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      return await fetchJson(url);
+    } catch (error) {
+      lastError = error;
+      if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 1200));
+    }
+  }
+  throw lastError;
+}
+
 async function loadJourneys({ silent = false } = {}) {
   if (!silent) {
     results.innerHTML = '<div class="empty">Verbindungen werden geladen …</div>';
@@ -318,44 +340,20 @@ async function loadJourneys({ silent = false } = {}) {
 
   try {
     const route = currentRoute();
-    const url = new URL(`${API}/stops/${route.from.id}/departures`);
-    url.searchParams.set('when', selectedDepartureIso());
-    url.searchParams.set('duration', '180');
-    url.searchParams.set('results', '30');
-    url.searchParams.set('stopovers', 'true');
-    url.searchParams.set('remarks', 'true');
-    url.searchParams.set('language', 'de');
-    url.searchParams.set('profile', 'dbnav');
-    url.searchParams.set('nationalExpress', 'true');
-    url.searchParams.set('national', 'true');
-    url.searchParams.set('regionalExpress', 'true');
-    url.searchParams.set('regional', 'true');
-    url.searchParams.set('suburban', 'true');
-    url.searchParams.set('bus', 'false');
-    url.searchParams.set('tram', 'false');
-    url.searchParams.set('subway', 'false');
-    url.searchParams.set('ferry', 'false');
-    url.searchParams.set('taxi', 'false');
-    url.searchParams.set('pretty', 'false');
-
-    const data = await fetchJson(url);
-    const departures = Array.isArray(data) ? data : (data.departures || []);
-    const journeys = departures
-      .map((dep) => departureToJourney(dep, route.to.id))
-      .filter(Boolean)
-      .slice(0, 8);
+    const data = await requestJourneys(route);
+    const journeys = Array.isArray(data) ? data : (data.journeys || []);
 
     results.innerHTML = '';
     if (!journeys.length) {
       const empty = document.createElement('div');
       empty.className = 'empty';
-      empty.textContent = 'Keine direkte Verbindung in den nächsten drei Stunden gefunden.';
+      empty.textContent = 'Keine Verbindung gefunden.';
       const link = document.createElement('a');
       link.className = 'db-fallback';
       link.href = officialDbUrl();
       link.target = '_blank';
       link.rel = 'noopener';
-      link.textContent = 'Weitere Verbindungen bei DB öffnen';
+      link.textContent = 'Bei DB suchen';
       empty.appendChild(link);
       results.appendChild(empty);
     } else {
