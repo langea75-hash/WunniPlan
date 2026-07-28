@@ -1,0 +1,13 @@
+{
+  "name": "WunniPlan",
+  "short_name": "WunniPlan",
+  "description": "Live-Verbindungen zwischen Wunstorf und Hannover Hbf",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f5f7",
+  "theme_color": "#b40016",
+  "lang": "de-DE",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

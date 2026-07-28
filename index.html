@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#b40016">
+  <meta name="description" content="Live-Bahnverbindungen zwischen Wunstorf und Hannover Hbf">
+  <title>WunniPlan</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>🚆 WunniPlan</h1>
+      <p>Wunstorf ↔ Hannover Hbf</p>
+    </div>
+    <button id="installBtn" class="install" hidden>App installieren</button>
+  </header>
+
+  <main>
+    <section class="route-card" aria-labelledby="routeTitle">
+      <h2 id="routeTitle" class="sr-only">Strecke</h2>
+      <div class="station">
+        <span class="label">Von</span>
+        <strong id="fromName">Wunstorf</strong>
+      </div>
+      <button id="swapBtn" class="swap" aria-label="Richtung wechseln" title="Richtung wechseln">⇅</button>
+      <div class="station">
+        <span class="label">Nach</span>
+        <strong id="toName">Hannover Hbf</strong>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Abfahrtszeit auswählen">
+      <button id="nowBtn" class="primary">Ab jetzt</button>
+      <label>
+        Datum
+        <input id="dateInput" type="date">
+      </label>
+      <label>
+        Uhrzeit
+        <input id="timeInput" type="time" step="300">
+      </label>
+      <button id="searchBtn" class="secondary">Verbindungen suchen</button>
+    </section>
+
+    <section class="status-row" aria-live="polite">
+      <span id="statusText">Live-Daten werden geladen …</span>
+      <button id="refreshBtn" class="refresh">↻ Aktualisieren</button>
+    </section>
+
+    <section id="results" class="results" aria-label="Verbindungen"></section>
+
+    <template id="journeyTemplate">
+      <article class="journey">
+        <div class="journey-head">
+          <div>
+            <span class="time departure-time"></span>
+            <span class="arrow">→</span>
+            <span class="time arrival-time"></span>
+          </div>
+          <span class="duration"></span>
+        </div>
+        <div class="delay-row"></div>
+        <div class="details">
+          <span class="train"></span>
+          <span class="platform"></span>
+          <span class="transfers"></span>
+        </div>
+        <div class="remarks"></div>
+        <button class="stops-toggle" type="button" aria-expanded="false">Zwischenbahnhöfe anzeigen</button>
+        <div class="stopovers" hidden></div>
+      </article>
+    </template>
+  </main>
+
+  <footer>
+    <p>Live-Daten über transport.rest. Angaben ohne Gewähr.</p>
+    <p>© Andreas Lange</p>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
