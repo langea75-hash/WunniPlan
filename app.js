@@ -2,8 +2,9 @@
 
 const API = 'https://v6.db.transport.rest';
 const stations = {
-  wunstorf: { query: 'Wunstorf', display: 'Wunstorf', id: null },
-  hannover: { query: 'Hannover Hbf', display: 'Hannover Hbf', id: null }
+  // Feste DB-Stationsnummern: weniger API-Aufrufe und dadurch zuverlässiger.
+  wunstorf: { display: 'Wunstorf', id: '8000268' },
+  hannover: { display: 'Hannover Hbf', id: '8000152' }
 };
 
 let direction = 'toHannover';
@@ -50,23 +51,6 @@ async function fetchJson(url) {
   } finally {
     clearTimeout(timeout);
   }
-}
-
-async function resolveStation(station) {
-  if (station.id) return station.id;
-  const url = new URL(`${API}/locations`);
-  url.searchParams.set('query', station.query);
-  url.searchParams.set('results', '5');
-  url.searchParams.set('poi', 'false');
-  url.searchParams.set('addresses', 'false');
-  url.searchParams.set('language', 'de');
-  url.searchParams.set('pretty', 'false');
-  const data = await fetchJson(url);
-  const exact = data.find((item) => item.type === 'stop' && item.name.toLowerCase() === station.query.toLowerCase());
-  const suitable = exact || data.find((item) => item.type === 'stop' && item.name.toLowerCase().includes(station.query.toLowerCase().split(' ')[0]));
-  if (!suitable?.id) throw new Error(`Bahnhof ${station.query} nicht gefunden`);
-  station.id = suitable.id;
-  return station.id;
 }
 
 function selectedDepartureIso() {
@@ -249,7 +233,8 @@ async function loadJourneys({ silent = false } = {}) {
 
   try {
     const route = currentRoute();
-    const [fromId, toId] = await Promise.all([resolveStation(route.from), resolveStation(route.to)]);
+    const fromId = route.from.id;
+    const toId = route.to.id;
     const url = new URL(`${API}/journeys`);
     url.searchParams.set('from', fromId);
     url.searchParams.set('to', toId);
@@ -260,6 +245,7 @@ async function loadJourneys({ silent = false } = {}) {
     url.searchParams.set('remarks', 'true');
     url.searchParams.set('language', 'de');
     url.searchParams.set('routingMode', 'HYBRID');
+    url.searchParams.set('profile', 'dbnav');
     url.searchParams.set('bus', 'false');
     url.searchParams.set('tram', 'false');
     url.searchParams.set('subway', 'false');
@@ -279,7 +265,8 @@ async function loadJourneys({ silent = false } = {}) {
   } catch (error) {
     console.error(error);
     if (!silent || !results.children.length) {
-      results.innerHTML = '<div class="error"><strong>Live-Daten nicht erreichbar.</strong><br>Bitte Internetverbindung prüfen und erneut aktualisieren.</div>';
+      const detail = error?.message ? `<small>Fehler: ${String(error.message).replace(/[<>]/g, '')}</small>` : '';
+      results.innerHTML = `<div class="error"><strong>Live-Daten momentan nicht erreichbar.</strong><br>Die Bahn-Datenquelle antwortet nicht. Bitte später erneut aktualisieren.${detail}</div>`;
     }
     statusText.textContent = 'Aktualisierung fehlgeschlagen';
   }
