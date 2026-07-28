@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111111">
+  <meta name="description" content="S-Bahn-, RE- und RB-Verbindungen zwischen Wunstorf und Hannover Hbf">
+  <title>WunniPlan</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div>
+    <h1>🚆 WunniPlan</h1>
+    <p id="routeTitle">Wunstorf → Hannover Hbf</p>
+  </div>
+  <button id="installBtn" class="install" hidden>Installieren</button>
+</header>
+
+<main>
+  <section class="route-card" aria-label="Strecke">
+    <div class="station"><span>Von</span><strong id="fromName">Wunstorf</strong></div>
+    <button id="swapBtn" class="swap" type="button" aria-label="Richtung wechseln">⇅</button>
+    <div class="station station-right"><span>Nach</span><strong id="toName">Hannover Hbf</strong></div>
+  </section>
+
+  <section class="search-card">
+    <button id="nowBtn" class="now-btn" type="button">Ab jetzt</button>
+    <div class="date-grid">
+      <label>Datum<input id="dateInput" type="date"></label>
+      <label>Uhrzeit<input id="timeInput" type="time" step="300"></label>
+    </div>
+    <button id="searchBtn" class="search-btn" type="button">Verbindungen suchen</button>
+  </section>
+
+  <section class="filter-card">
+    <strong>Diese Züge werden angezeigt:</strong>
+    <div class="chips" aria-label="Verkehrsmittel">
+      <span>S-Bahn</span><span>RE</span><span>RB</span>
+    </div>
+    <p>Nur Bahnverbindungen. Keine Busverbindungen.</p>
+  </section>
+
+  <div class="status-row">
+    <p id="statusText">Bereit</p>
+    <button id="refreshBtn" type="button">↻ Aktualisieren</button>
+  </div>
+
+  <section id="results" class="results" aria-live="polite"></section>
+
+  <section id="errorBox" class="error-box" hidden>
+    <strong>Live-Verbindungen konnten nicht geladen werden.</strong>
+    <p id="errorText">Bitte später erneut versuchen.</p>
+    <a id="dbLink" href="https://int.bahn.de/de/buchung/fahrplan/suche" target="_blank" rel="noopener">Verbindung bei DB öffnen</a>
+  </section>
+</main>
+
+<footer>
+  <p>Fahrplandaten über Transitous/MOTIS. Angaben ohne Gewähr.</p>
+  <p><a href="https://transitous.org/sources/" target="_blank" rel="noopener">Datenquellen und OpenStreetMap-Hinweise</a></p>
+  <p>© Andreas Lange</p>
+</footer>
+<script src="app.js" defer></script>
+</body>
+</html>
