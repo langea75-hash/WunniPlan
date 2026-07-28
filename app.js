@@ -225,6 +225,91 @@ function renderJourney(journey) {
   results.appendChild(template);
 }
 
+function officialDbUrl() {
+  const route = currentRoute();
+  const date = $('dateInput').value;
+  const time = $('timeInput').value;
+  const dt = new Date(`${date}T${time}:00`);
+  const pad = (n) => String(n).padStart(2, '0');
+  const dbDate = `${pad(dt.getDate())}.${pad(dt.getMonth() + 1)}.${dt.getFullYear()}`;
+  const dbTime = `${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+  const url = new URL('https://www.bahn.de/buchung/fahrplan/suche');
+  url.searchParams.set('so', route.from.display);
+  url.searchParams.set('zo', route.to.display);
+  url.searchParams.set('hd', `${dbDate}T${dbTime}:00`);
+  url.searchParams.set('hza', 'D');
+  url.searchParams.set('ar', 'false');
+  url.searchParams.set('s', 'true');
+  url.searchParams.set('d', 'true');
+  return url.toString();
+}
+
+function showApiError(error) {
+  console.error(error);
+  const box = document.createElement('div');
+  box.className = 'error';
+  const strong = document.createElement('strong');
+  strong.textContent = 'Live-Datenquelle antwortet gerade nicht.';
+  const text = document.createElement('p');
+  text.textContent = 'Du kannst die Verbindung trotzdem direkt bei der Deutschen Bahn öffnen.';
+  const link = document.createElement('a');
+  link.className = 'db-fallback';
+  link.href = officialDbUrl();
+  link.target = '_blank';
+  link.rel = 'noopener';
+  link.textContent = 'Verbindung bei DB öffnen';
+  box.append(strong, text, link);
+  if (error?.message) {
+    const detail = document.createElement('small');
+    detail.textContent = `Technischer Fehler: ${error.message}`;
+    box.appendChild(detail);
+  }
+  results.innerHTML = '';
+  results.appendChild(box);
+  statusText.textContent = 'Live-Aktualisierung fehlgeschlagen';
+}
+
+function departureToJourney(dep, targetId) {
+  const stopovers = dep.stopovers || [];
+  const targetIndex = stopovers.findIndex((s) => String(s.stop?.id || s.station?.id || '') === String(targetId));
+  if (targetIndex < 0) return null;
+  const target = stopovers[targetIndex];
+  const relevantStops = stopovers.slice(0, targetIndex + 1);
+  const originStop = relevantStops[0] || {
+    stop: dep.stop,
+    departure: dep.when,
+    plannedDeparture: dep.plannedWhen,
+    departureDelay: dep.delay,
+    departurePlatform: dep.platform,
+    plannedDeparturePlatform: dep.plannedPlatform
+  };
+  originStop.departure ||= dep.when;
+  originStop.plannedDeparture ||= dep.plannedWhen;
+  originStop.departureDelay ??= dep.delay;
+  originStop.departurePlatform ||= dep.platform;
+  originStop.plannedDeparturePlatform ||= dep.plannedPlatform;
+  return {
+    legs: [{
+      origin: originStop.stop || dep.stop,
+      destination: target.stop || target.station,
+      departure: dep.when || originStop.departure,
+      plannedDeparture: dep.plannedWhen || originStop.plannedDeparture,
+      departureDelay: dep.delay ?? originStop.departureDelay,
+      departurePlatform: dep.platform || originStop.departurePlatform,
+      plannedDeparturePlatform: dep.plannedPlatform || originStop.plannedDeparturePlatform,
+      arrival: target.arrival || target.plannedArrival,
+      plannedArrival: target.plannedArrival,
+      arrivalDelay: target.arrivalDelay,
+      arrivalPlatform: target.arrivalPlatform,
+      plannedArrivalPlatform: target.plannedArrivalPlatform,
+      line: dep.line,
+      cancelled: dep.cancelled,
+      remarks: dep.remarks || [],
+      stopovers: relevantStops
+    }]
+  };
+}
+
 async function loadJourneys({ silent = false } = {}) {
   if (!silent) {
     results.innerHTML = '<div class="empty">Verbindungen werden geladen …</div>';
@@ -233,19 +318,19 @@ async function loadJourneys({ silent = false } = {}) {
 
   try {
     const route = currentRoute();
-    const fromId = route.from.id;
-    const toId = route.to.id;
-    const url = new URL(`${API}/journeys`);
-    url.searchParams.set('from', fromId);
-    url.searchParams.set('to', toId);
-    url.searchParams.set('departure', selectedDepartureIso());
-    url.searchParams.set('results', '6');
-    url.searchParams.set('transfers', '1');
+    const url = new URL(`${API}/stops/${route.from.id}/departures`);
+    url.searchParams.set('when', selectedDepartureIso());
+    url.searchParams.set('duration', '180');
+    url.searchParams.set('results', '30');
     url.searchParams.set('stopovers', 'true');
     url.searchParams.set('remarks', 'true');
     url.searchParams.set('language', 'de');
-    url.searchParams.set('routingMode', 'HYBRID');
     url.searchParams.set('profile', 'dbnav');
+    url.searchParams.set('nationalExpress', 'true');
+    url.searchParams.set('national', 'true');
+    url.searchParams.set('regionalExpress', 'true');
+    url.searchParams.set('regional', 'true');
+    url.searchParams.set('suburban', 'true');
     url.searchParams.set('bus', 'false');
     url.searchParams.set('tram', 'false');
     url.searchParams.set('subway', 'false');
@@ -254,21 +339,32 @@ async function loadJourneys({ silent = false } = {}) {
     url.searchParams.set('pretty', 'false');
 
     const data = await fetchJson(url);
+    const departures = Array.isArray(data) ? data : (data.departures || []);
+    const journeys = departures
+      .map((dep) => departureToJourney(dep, route.to.id))
+      .filter(Boolean)
+      .slice(0, 8);
+
     results.innerHTML = '';
-    const journeys = data.journeys || [];
     if (!journeys.length) {
-      results.innerHTML = '<div class="empty">Keine Verbindung gefunden.</div>';
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = 'Keine direkte Verbindung in den nächsten drei Stunden gefunden.';
+      const link = document.createElement('a');
+      link.className = 'db-fallback';
+      link.href = officialDbUrl();
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = 'Weitere Verbindungen bei DB öffnen';
+      empty.appendChild(link);
+      results.appendChild(empty);
     } else {
       journeys.forEach(renderJourney);
     }
     statusText.textContent = `Aktualisiert: ${formatTime(new Date())} Uhr`;
   } catch (error) {
-    console.error(error);
-    if (!silent || !results.children.length) {
-      const detail = error?.message ? `<small>Fehler: ${String(error.message).replace(/[<>]/g, '')}</small>` : '';
-      results.innerHTML = `<div class="error"><strong>Live-Daten momentan nicht erreichbar.</strong><br>Die Bahn-Datenquelle antwortet nicht. Bitte später erneut aktualisieren.${detail}</div>`;
-    }
-    statusText.textContent = 'Aktualisierung fehlgeschlagen';
+    if (!silent || !results.children.length) showApiError(error);
+    else statusText.textContent = 'Aktualisierung fehlgeschlagen';
   }
 }
 

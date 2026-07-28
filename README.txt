@@ -1,23 +1,8 @@
-WunniPlan – Wunstorf ↔ Hannover Hbf
-================================
+WunniPlan v1.5
 
-Funktionen:
-- echte aktuelle Verbindungen
-- Verspätung und Ausfall
-- Abfahrtsgleis und Gleisänderung
-- alle Zwischenbahnhöfe mit Zeiten und Gleisen
-- Richtung wechseln
-- Datum und Uhrzeit auswählen
-- automatische Aktualisierung jede Minute bei aktuellen Fahrten
-- als App installierbar (PWA)
+Live-Verbindungen Wunstorf ↔ Hannover Hbf.
+Die App nutzt eine sparsame Abfahrtsabfrage und zeigt direkte Züge mit Zwischenbahnhöfen.
+Falls die kostenlose Live-Datenquelle nicht erreichbar ist, erscheint ein Link zur offiziellen DB-Verbindungssuche.
 
-Online stellen:
-1. Alle Dateien in ein GitHub-Repository oder auf einen Webspace hochladen.
-2. GitHub Pages bzw. HTTPS aktivieren.
-3. index.html öffnen.
-
-Wichtig:
-Die Live-Daten werden von https://v6.db.transport.rest geladen.
-Die App braucht für die Fahrplandaten eine Internetverbindung.
-
-© Andreas Lange
+Installation auf GitHub Pages:
+Alle Dateien aus diesem Ordner direkt in das Hauptverzeichnis des Repositorys hochladen.

@@ -9,7 +9,7 @@ body { margin: 0; min-height: 100vh; }
 button, input { font: inherit; }
 button { cursor: pointer; }
 .topbar {
-  background: #b40016;
+  background: #111111;
   color: white;
   padding: 18px max(18px, env(safe-area-inset-left));
   display: flex;
@@ -19,7 +19,7 @@ button { cursor: pointer; }
 }
 .topbar h1 { margin: 0; font-size: 1.6rem; }
 .topbar p { margin: 4px 0 0; }
-.install { border: 2px solid white; background: white; color: #8d0012; border-radius: 10px; padding: 9px 12px; font-weight: 700; }
+.install { border: 2px solid white; background: white; color: #111111; border-radius: 10px; padding: 9px 12px; font-weight: 700; }
 main { width: min(760px, 100%); margin: 0 auto; padding: 18px; }
 .route-card {
   display: grid;
@@ -47,12 +47,12 @@ main { width: min(760px, 100%); margin: 0 auto; padding: 18px; }
 .controls label { display: flex; flex-direction: column; gap: 5px; font-size: .85rem; color: #555; }
 input { width: 100%; min-height: 46px; border: 1px solid #bbb; border-radius: 9px; padding: 7px; background: white; color: #202020; }
 .primary, .secondary { min-height: 46px; border-radius: 10px; border: 0; padding: 10px 14px; font-weight: 700; }
-.primary { background: #b40016; color: white; align-self: end; }
+.primary { background: #111111; color: white; align-self: end; }
 .secondary { grid-column: 1 / -1; background: #222; color: white; }
 .status-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 18px 2px 10px; color: #555; }
-.refresh { border: 0; background: transparent; color: #8d0012; font-weight: 700; padding: 7px; }
+.refresh { border: 0; background: transparent; color: #111111; font-weight: 700; padding: 7px; }
 .results { display: grid; gap: 12px; }
-.journey { background: white; border-radius: 15px; padding: 16px; box-shadow: 0 2px 10px #00000010; border-left: 6px solid #b40016; }
+.journey { background: white; border-radius: 15px; padding: 16px; box-shadow: 0 2px 10px #00000010; border-left: 6px solid #111111; }
 .journey.canceled { border-left-color: #555; opacity: .78; }
 .journey-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .time { font-size: 1.45rem; font-weight: 800; }
@@ -88,9 +88,13 @@ footer p { margin: 4px; }
 .stop-row { display: grid; grid-template-columns: 52px 18px 1fr; align-items: stretch; min-height: 52px; }
 .stop-time { padding-top: 9px; font-variant-numeric: tabular-nums; font-weight: 700; }
 .stop-marker { position: relative; }
-.stop-marker::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #b40016; }
-.stop-marker::after { content: ''; position: absolute; left: 4px; top: 15px; width: 8px; height: 8px; border: 2px solid #b40016; border-radius: 50%; background: white; }
-.stop-row.endpoint .stop-marker::after { left: 2px; top: 13px; width: 12px; height: 12px; background: #b40016; }
+.stop-marker::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #111111; }
+.stop-marker::after { content: ''; position: absolute; left: 4px; top: 15px; width: 8px; height: 8px; border: 2px solid #111111; border-radius: 50%; background: white; }
+.stop-row.endpoint .stop-marker::after { left: 2px; top: 13px; width: 12px; height: 12px; background: #111111; }
 .stop-info { display: flex; flex-direction: column; gap: 2px; padding: 7px 0 8px 8px; }
 .stop-info small { color: #666; font-size: .78rem; }
 .stop-info small:has(*) { color: #666; }
+
+.db-fallback { display:block; margin-top:16px; padding:14px 18px; border-radius:14px; background:#111111; color:#fff; text-decoration:none; font-weight:700; text-align:center; }
+.error p { margin:10px 0 0; }
+.error small { display:block; margin-top:12px; opacity:.75; overflow-wrap:anywhere; }
