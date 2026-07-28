@@ -9,56 +9,59 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://transitous.org/bootstrap.min.css">
-  <link rel="stylesheet" href="https://transitous.org/bootstrap-icons.min.css">
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <h1>🚆 WunniPlan</h1>
-      <p id="routeTitle">Wunstorf → Hannover Hbf</p>
+<header class="topbar">
+  <div>
+    <h1>🚆 WunniPlan</h1>
+    <p id="routeTitle">Wunstorf → Hannover Hbf</p>
+  </div>
+  <button id="installBtn" class="install" hidden>Installieren</button>
+</header>
+
+<main>
+  <section class="route-card" aria-label="Strecke">
+    <div class="station"><span>Von</span><strong id="fromName">Wunstorf</strong></div>
+    <button id="swapBtn" class="swap" type="button" aria-label="Richtung wechseln">⇅</button>
+    <div class="station station-right"><span>Nach</span><strong id="toName">Hannover Hbf</strong></div>
+  </section>
+
+  <section class="search-card">
+    <button id="nowBtn" class="now-btn" type="button">Ab jetzt</button>
+    <div class="date-grid">
+      <label>Datum<input id="dateInput" type="date"></label>
+      <label>Uhrzeit<input id="timeInput" type="time" step="300"></label>
     </div>
-    <button id="installBtn" class="install" hidden>Installieren</button>
-  </header>
+    <button id="searchBtn" class="search-btn" type="button">Verbindungen suchen</button>
+  </section>
 
-  <main>
-    <section class="route-card" aria-label="Strecke">
-      <div class="station">
-        <span>Von</span>
-        <strong id="fromName">Wunstorf</strong>
-      </div>
-      <button id="swapBtn" class="swap" aria-label="Richtung wechseln">⇅</button>
-      <div class="station station-right">
-        <span>Nach</span>
-        <strong id="toName">Hannover Hbf</strong>
-      </div>
-    </section>
-
-    <section class="info-card">
-      <strong>Aktuelle Verbindungen mit S-Bahn, RE und RB</strong>
-      <p>Datum und Uhrzeit auswählen. Danach auf „Suchen“ tippen.</p>
-    </section>
-
-    <section class="widget-card" aria-label="Verbindungssuche">
-      <style scoped>@import "https://transitous.org/custom.css";</style>
-      <div id="searchbox"></div>
-    </section>
-
-    <p id="loadingText" class="loading">Verbindungssuche wird geladen …</p>
-    <div id="errorBox" class="error" hidden>
-      <strong>Die Verbindungssuche konnte nicht geladen werden.</strong>
-      <a href="https://transitous.org" target="_blank" rel="noopener">Transitous direkt öffnen</a>
+  <section class="filter-card">
+    <strong>Diese Züge werden angezeigt:</strong>
+    <div class="chips" aria-label="Verkehrsmittel">
+      <span>S-Bahn</span><span>RE</span><span>RB</span>
     </div>
-  </main>
+    <p>Nur Bahnverbindungen. Keine Busverbindungen.</p>
+  </section>
 
-  <footer>
-    <p>Fahrplandaten über Transitous/MOTIS.</p>
-    <p><a href="https://transitous.org/sources/" target="_blank" rel="noopener">Datenquellen und OpenStreetMap-Hinweise</a></p>
-    <p>© Andreas Lange</p>
-  </footer>
+  <div class="status-row">
+    <p id="statusText">Bereit</p>
+    <button id="refreshBtn" type="button">↻ Aktualisieren</button>
+  </div>
 
-  <script src="https://transitous.org/widget.js"></script>
-  <script src="https://transitous.org/embed.js"></script>
-  <script src="app.js" defer></script>
+  <section id="results" class="results" aria-live="polite"></section>
+
+  <section id="errorBox" class="error-box" hidden>
+    <strong>Live-Verbindungen konnten nicht geladen werden.</strong>
+    <p id="errorText">Bitte später erneut versuchen.</p>
+    <a id="dbLink" href="https://int.bahn.de/de/buchung/fahrplan/suche" target="_blank" rel="noopener">Verbindung bei DB öffnen</a>
+  </section>
+</main>
+
+<footer>
+  <p>Fahrplandaten über Transitous/MOTIS. Angaben ohne Gewähr.</p>
+  <p><a href="https://transitous.org/sources/" target="_blank" rel="noopener">Datenquellen und OpenStreetMap-Hinweise</a></p>
+  <p>© Andreas Lange</p>
+</footer>
+<script src="app.js" defer></script>
 </body>
 </html>

@@ -1,16 +1,16 @@
-WunniPlan v1.8
+WunniPlan v1.9
 
-Wichtig:
-- Alle alten Dateien im GitHub-Repository ersetzen.
-- Die Dateien aus diesem Ordner direkt in das Hauptverzeichnis hochladen.
-- Danach auf dem Handy den Website-Cache löschen oder die Seite im Inkognito-Modus testen.
+1. Im GitHub-Repository alle bisherigen App-Dateien löschen.
+2. Die sechs Dateien aus diesem Ordner direkt in das Repository hochladen.
+3. Keine zusätzliche Unterordner-Ebene hochladen.
+4. Nach dem Speichern 1 bis 3 Minuten warten.
+5. Zum Testen zuerst öffnen:
+   https://langea75-hash.github.io/WunniPlan/?v=1.9
 
 Neu:
-- S-Bahn-Verbindungen werden ausdrücklich mit angezeigt.
-- Zusätzlich bleiben RE, RB und weitere passende Bahnverbindungen sichtbar.
-- Richtung Wunstorf ↔ Hannover wechselbar.
-- Schwarzes Design bleibt erhalten.
-- Kein eigener API-Schlüssel notwendig.
-
-Hinweis:
-Die App lädt die Verbindungssuche online von Transitous. Eine Internetverbindung ist erforderlich.
+- Eigene Ergebnisanzeige innerhalb von WunniPlan
+- S-Bahn, RE und RB
+- Keine Busverbindungen
+- Direkte Verbindungen
+- Zwischenbahnhöfe, Gleise und Verspätungen
+- Kein eingebettetes Transitous-Fenster mehr
