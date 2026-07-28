@@ -1,7 +1,16 @@
-WunniPlan v1.6
+WunniPlan v1.8
 
-Live-Verbindungen Wunstorf ↔ Hannover Hbf.
-Die App nutzt die öffentliche Schnittstelle v6.db.transport.rest.
-Bei einem Ausfall öffnet der DB-Knopf Start und Ziel direkt auf bahn.de.
+Wichtig:
+- Alle alten Dateien im GitHub-Repository ersetzen.
+- Die Dateien aus diesem Ordner direkt in das Hauptverzeichnis hochladen.
+- Danach auf dem Handy den Website-Cache löschen oder die Seite im Inkognito-Modus testen.
 
-Alle Dateien direkt in das GitHub-Repository hochladen.
+Neu:
+- S-Bahn-Verbindungen werden ausdrücklich mit angezeigt.
+- Zusätzlich bleiben RE, RB und weitere passende Bahnverbindungen sichtbar.
+- Richtung Wunstorf ↔ Hannover wechselbar.
+- Schwarzes Design bleibt erhalten.
+- Kein eigener API-Schlüssel notwendig.
+
+Hinweis:
+Die App lädt die Verbindungssuche online von Transitous. Eine Internetverbindung ist erforderlich.
